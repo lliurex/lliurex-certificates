@@ -1,0 +1,74 @@
+#!/bin/bash
+# -------
+# File:        lliurex-user-certs
+# Description: lliurex-user-certs session script
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin St, Fifth Floor, Boston MA 02110-1301 USA
+# --------
+
+
+# variables
+
+MOZILLA_DIR=".mozilla"
+FIREFOX_CERT_DB="cert8.db"
+
+# variables
+CA_CERTS_DIR="/usr/share/ca-certificates"
+LCERTS_DIR="${CA_CERTS_DIR}/lliurex-certs"
+LCERTS_CFG="/etc/ca-certificates.conf"
+
+# functions
+get_rel_files(){
+   [ -d "$1" ] || return 0
+   find "$1" -xtype f -printf "%P\0"
+   return 0
+}
+
+
+if [ -d "$HOME/$MOZILLA_DIR" ] ; then
+	# Mozilla user settings directory exist
+	cert_databases=$(find "$HOME/$MOZILLA_DIR" -name "$FIREFOX_CERT_DB")
+	for cert_db in ${cert_databases} ; do 
+		dirname_cert=$(dirname "$cert_db")
+		get_rel_files "$LCERTS_DIR" |while read -d $'\0' relcert ; do
+                	certificate="$LCERTS_DIR/$relcert"
+			info="$(openssl x509 -in $certificate -noout -subject |sed -e "s%^.*\/CN=\([^/]\+\).*$%\1%")"
+			ADD_CERTIFICATE="Y"
+			# search in database
+			if certutil -L -d "$dirname_cert" | grep -q "^$info" ; then
+				TMP1="$(tempfile)"
+				# dump new certificate
+				openssl x509 -in $certificate > "$TMP1" || true
+				TMP2="$(tempfile)"
+                                # dump current certificate
+				certutil -L -a -d "$dirname_cert" -n "$info" > "$TMP2" || true
+				# compare without cr/lf
+				if diff -q --strip-trailing-cr "$TMP1" "$TMP2" >/dev/null ; then
+					# are just the same, so do nothing
+					ADD_CERTIFICATE=""
+				else
+					# remove old
+					certutil -D -n "$info" -d "$dirname_cert" || true
+				fi
+				rm -f "$TMP1" "$TMP2"
+			fi
+			if [ "$ADD_CERTIFICATE" = "Y" ] ; then
+				certutil -A -n "$info" -t "CT,C,C" -i "$certificate" -d "$dirname_cert"
+			fi
+		done
+	done
+fi
+
+exit 0
