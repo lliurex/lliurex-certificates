@@ -1,0 +1,146 @@
+lliurex-certificates (0.30) bionic; urgency=high
+
+  * First bionic release
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Mon, 25 Mar 2019 09:57:59 +0100
+
+lliurex-certificates (0.28) xenial; urgency=high
+
+  * Updated macrolan certificate
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Thu, 21 Mar 2019 09:13:03 +0100
+
+lliurex-certificates (0.27) xenial; urgency=medium
+
+  * Packege ported from trusty
+
+ -- M.Angel Juan <m.angel.juan@gmail.com>  Mon, 01 Feb 2016 17:51:44 +0100
+
+lliurex-certificates (0.24) trusty; urgency=high
+
+  * First version for trusty
+
+ -- Daniel Duran Vecino <daduve@gmail.com>  Wed, 14 Jan 2015 17:57:25 +0100
+
+lliurex-certificates (0.23) precise; urgency=high
+
+  * Fixed type of certificates.
+  * Changed crt to pem
+  * Is VERY IMPORTANT that ALL CERTS installed by this package
+    will be in correct format. 
+
+ -- Angel Berlanas Vicente <angel.berlanas@gmail.com>  Thu, 14 Nov 2013 11:08:23 +0100
+
+lliurex-certificates (0.22) precise; urgency=high
+
+  * Updated ca-certificates 
+
+ -- Angel Berlanas Vicente <angel.berlanas@gmail.com>  Wed, 13 Nov 2013 12:20:14 +0100
+
+lliurex-certificates (0.19) precise; urgency=high
+
+  * Removed llxcfg-runtime dependence
+
+ -- Angel Berlanas Vicente <angel.berlanas@gmail.com>  Tue, 12 Nov 2013 09:10:15 +0100
+
+lliurex-certificates (0.18) precise; urgency=low
+
+  * Rewrited postinst and prerm 
+
+ -- Jaime Munyoz Fayos <munyoz_jaifay@gva.es>  Wed, 29 May 2013 10:31:13 +0200
+
+lliurex-certificates (0.17) precise; urgency=low
+
+  * Added gva certificates and dni-e 
+
+ -- Jaime Munyoz Fayos <munyoz_jaifay@gva.es>  Wed, 29 May 2013 09:19:06 +0200
+
+lliurex-certificates (0.16) precise; urgency=low
+
+  * Updated version for precise
+
+ -- Angel Berlanas Vicente <angel.berlanas@gmail.com>  Mon, 22 Apr 2013 11:02:34 +0200
+
+lliurex-certificates (0.13) lucid; urgency=low
+
+  * Added MacroLan Certificate for navigation 
+
+ -- Angel Berlanas Vicente <lliurex_devel2@edu.gva.es>  Tue, 16 Apr 2013 09:42:07 +0200
+
+lliurex-certificates (0.11) unstable; urgency=low
+
+  * Uploaders Fixed
+
+ -- Jose Carlos Garcia <garcia_josmon@gva.es>  Tue, 17 Jan 2012 11:51:20 +0100
+
+lliurex-certificates (0.10) unstable; urgency=low
+
+  * Minor changes
+
+ -- Luis Antonio Garcia Gisbert <garcia_luigis@gva.es>  Fri, 25 Jun 2010 09:48:10 +0200
+
+lliurex-certificates (0.9) unstable; urgency=low
+
+  * Improved detection of x509 certificate format. The script
+    uses a "trial and error" method based in openssl utility
+    no more parsing of 'file' output)
+  * Added some code to check x509 certificate changes. Now,
+    new versions of installed certificates are detected and
+    correctly managed, so the user's firefox database is
+    updated.
+  * Added current lliurex.net x509 certificate.
+
+ -- Luis Antonio Garcia Gisbert <garcia_luigis@gva.es>  Wed, 23 Jun 2010 23:36:18 +0200
+
+lliurex-certificates (0.8) unstable; urgency=low
+
+  * Assume 'ASCII text' as default for unknown certificates 
+
+ -- Luis Antonio Garcia Gisbert <garcia_luigis@gva.es>  Wed, 23 Jun 2010 14:58:33 +0200
+
+lliurex-certificates (0.7) unstable; urgency=low
+
+  * First version for Leia
+  * Fixed | "PEM RSA private key" option on lliurex-certs 
+
+ -- Angel Berlanas Vicente <lliurex_devel2@edu.gva.es>  Thu, 10 Dec 2009 11:46:56 +0100
+
+lliurex-certificates (0.6) unstable; urgency=low
+
+  * First version for Kripton
+
+ -- Angel Berlanas Vicente <lliurex_devel2@edu.gva.es>  Thu, 10 Dec 2009 11:45:17 +0100
+
+lliurex-certificates (0.5) unstable; urgency=low
+
+  * First Indy version
+
+ -- Javier Garcia Escribano <garcia_javesc@gva.es>  Thu, 26 Mar 2009 14:19:58 +0100
+
+lliurex-certificates (0.3) unstable; urgency=low
+
+  * Use of the list of certificates databases fixed
+  * Added missing dependence, libnss3-tools
+
+ -- Fco Javier Lopez Perez <lopez_frajav@gva.es>  Wed, 11 Mar 2009 13:08:16 +0100
+
+lliurex-certificates (0.2) unstable; urgency=low
+
+  * fixed file access permissions when installing certificates
+
+ -- Luis Antonio Garcia Gisbert <garcia_luigis@gva.es>  Wed, 11 Mar 2009 12:10:12 +0100
+
+lliurex-certificates (0.1) unstable; urgency=low
+
+  [ Luis Antonio Garcia Gisbert ]
+  * Initial release.
+  * Added lliurex-certs (LliureX certificates database manager)
+  * Fixed lliurex-user-certs to read and install certificates already managed
+    by lliurex-certs
+
+  [ Fco Javier Lopez Perez ]
+  * Added xdg desktop and script to manage certificates 
+  * Non manageable certificates will not be installed
+  * Certificate type management fixed
+
+ -- Fco Javier Lopez Perez <lopez_frajav@gva.es>  Tue, 10 Mar 2009 09:49:56 +0100

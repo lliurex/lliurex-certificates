@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+#Finding certificates to delete in path
+#PATH_TO_CERTIFICATES="/usr/share/lliurex-certificates/"
+#for elemento in $(ls $PATH_TO_CERTIFICATES)
+#do
+#	if  [ -d $PATH_TO_CERTIFICATES$elemento ] ; then
+#		lliurex-certs del $PATH_TO_CERTIFICATES$elemento || true
+#	fi
+#done
+
+update-ca-certificates || true
+
+#Old version
+#lliurex-certs del /usr/share/lliurex-certificates/lliurex.net || true
+
+#DEBHELPER#
