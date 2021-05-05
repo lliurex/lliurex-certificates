@@ -22,7 +22,7 @@
 # variables
 
 MOZILLA_DIR=".mozilla"
-FIREFOX_CERT_DB="cert8.db"
+FIREFOX_CERT_DB="cert9.db"
 
 # variables
 CA_CERTS_DIR="/usr/share/ca-certificates"
