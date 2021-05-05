@@ -1,3 +1,11 @@
+lliurex-certificates (0.40) focal; urgency=medium
+
+  * Updated ACCV and DNIE certificates
+  * Fixed mozilla cert database name
+  * Initial release for focal
+
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Wed, 05 May 2021 09:04:42 +0200
+
 lliurex-certificates (0.30) bionic; urgency=high
 
   * First bionic release
