@@ -1,3 +1,9 @@
+lliurex-certificates (0.41) focal; urgency=medium
+
+  * Fixed ACCV certificates
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Thu, 05 Aug 2021 09:32:53 +0200
+
 lliurex-certificates (0.40) focal; urgency=medium
 
   * Updated ACCV and DNIE certificates
