@@ -1,3 +1,9 @@
+lliurex-certificates (0.43) focal; urgency=medium
+
+  * Change tsa1accv2016.cer to crt
+
+ -- Juanma1980 <juanma1980@gmail.com>  Mon, 05 Jun 2023 15:53:09 +0200
+
 lliurex-certificates (0.42) focal; urgency=medium
 
   * Removed some ACCV certificates
