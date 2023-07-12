@@ -65,7 +65,7 @@ if [ -d "$HOME/$MOZILLA_DIR" ] ; then
 				rm -f "$TMP1" "$TMP2"
 			fi
 			if [ "$ADD_CERTIFICATE" = "Y" ] ; then
-				certutil -A -n "$info" -t "CT,C,C" -i "$certificate" -d "$dirname_cert"
+				certutil -A -n "$info" -t "CT,C,C" -i "$certificate" -d sql:"$dirname_cert"
 			fi
 		done
 	done
