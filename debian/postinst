@@ -1,0 +1,42 @@
+#!/bin/sh
+
+set -e
+
+#Finding certificates to add in path
+PATH_TO_CERTIFICATES="/usr/share/ca-certificates/"
+PATH_TO_CONFIGURATION="/etc/ca-certificates.conf"
+
+case $1 in 
+
+	configure)
+		# Empty the warrens
+		echo "Cleaning certificate database"
+		:> ${PATH_TO_CONFIGURATION}
+		for certificate  in $(find ${PATH_TO_CERTIFICATES} -xtype f ); do
+			echo "${certificate}"| cut -d "/" -f 5- >> ${PATH_TO_CONFIGURATION}
+		done
+		;;
+
+	*)
+		echo "Nothing to do"
+		;;
+
+esac
+
+
+#for elemento in $(ls $PATH_TO_CERTIFICATES)
+#do
+#	if  [ -d $PATH_TO_CERTIFICATES$elemento ] ; then
+#		lliurex-certs add $PATH_TO_CERTIFICATES$elemento || true
+#	fi
+#done
+
+
+
+update-ca-certificates || true
+
+
+#Old version
+#lliurex-certs add /usr/share/lliurex-certificates/lliurex.net || true
+#lliurex-certs add /usr/share/lliurex-certificates/macrolan-certificates || true
+#DEBHELPER#
