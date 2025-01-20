@@ -1,3 +1,9 @@
+lliurex-certificates (0.44) focal; urgency=medium
+
+  * Browsing certificate 
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Mon, 20 Jan 2025 10:56:25 +0100
+
 lliurex-certificates (0.43) focal; urgency=medium
 
   * Change tsa1accv2016.cer to crt
