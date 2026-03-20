@@ -1,3 +1,11 @@
+lliurex-certificates (0.45.1) jammy; urgency=medium
+
+  * Making sure cert file is owned by user
+  * fixed tempfile deprecation  
+  * 1>/dev/null when checking SocketAutoFirma
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Fri, 20 Mar 2026 12:15:55 +0100
+
 lliurex-certificates (0.45) jammy; urgency=medium
 
   * Added autofirma support 
