@@ -52,6 +52,10 @@ if [ -d "$HOME/$MOZILLA_DIR" ] ; then
 	# Mozilla user settings directory exist
 	cert_databases=$(find "$HOME/$MOZILLA_DIR" -name "$FIREFOX_CERT_DB")" $NSSDBDIR"
 	for cert_db in ${cert_databases} ; do 
+		if [ ! -O $cert_db ];then
+			# cert_db not owned by user. Skipping...
+			continue
+		fi
 		dirname_cert=$(dirname "$cert_db")
 		get_rel_files "$LCERTS_DIR" |while read -d $'\0' relcert ; do
                 	certificate="$LCERTS_DIR/$relcert"
@@ -59,10 +63,10 @@ if [ -d "$HOME/$MOZILLA_DIR" ] ; then
 			ADD_CERTIFICATE="Y"
 			# search in database
 			if certutil -L -d "$dirname_cert" | grep -q "^$info" ; then
-				TMP1="$(tempfile)"
+				TMP1="$(mktemp)"
 				# dump new certificate
 				openssl x509 -in $certificate > "$TMP1" || true
-				TMP2="$(tempfile)"
+				TMP2="$(mktemp)"
                                 # dump current certificate
 				certutil -L -a -d "$dirname_cert" -n "$info" > "$TMP2" || true
 				# compare without cr/lf
@@ -83,7 +87,7 @@ if [ -d "$HOME/$MOZILLA_DIR" ] ; then
 		# AUTOFIRMA  FIREFOX
 		if [ -e "$AUTOFIRMA_CRT" ]; then
 			FOUND=0
-			certutil -L -d "$dirname_cert" | grep $AUTOFIRMA_ALIAS || FOUND=1
+			certutil -L -d "$dirname_cert" | grep $AUTOFIRMA_ALIAS 1>/dev/null || FOUND=1
 			if [ $FOUND = 1 ];then
 				certutil -A -n "$AUTOFIRMA_ALIAS" -t "TCP,TCP,TCP" -i "$AUTOFIRMA_CRT" -d sql:"$dirname_cert"
 			fi
