@@ -23,11 +23,16 @@
 
 MOZILLA_DIR=".mozilla"
 FIREFOX_CERT_DB="cert9.db"
+NSSDBDIR="$HOME/.pki/nssdb/"
 
 # variables
 CA_CERTS_DIR="/usr/share/ca-certificates"
 LCERTS_DIR="${CA_CERTS_DIR}/lliurex-certs"
 LCERTS_CFG="/etc/ca-certificates.conf"
+
+# Autofirma
+AUTOFIRMA_CRT="/usr/share/ca-certificates/Autofirma/Autofirma_ROOT.crt"
+AUTOFIRMA_ALIAS="SocketAutoFirma"
 
 # functions
 get_rel_files(){
@@ -37,9 +42,15 @@ get_rel_files(){
 }
 
 
+# Lets make sure this dir and file exists
+if [ ! -e  "$NSSDBDIR" ]; then
+	mkdir -p "$NSSDBDIR"
+	certutil -d "$NSSDBDIR" -N --empty-password
+fi
+
 if [ -d "$HOME/$MOZILLA_DIR" ] ; then
 	# Mozilla user settings directory exist
-	cert_databases=$(find "$HOME/$MOZILLA_DIR" -name "$FIREFOX_CERT_DB")
+	cert_databases=$(find "$HOME/$MOZILLA_DIR" -name "$FIREFOX_CERT_DB")" $NSSDBDIR"
 	for cert_db in ${cert_databases} ; do 
 		dirname_cert=$(dirname "$cert_db")
 		get_rel_files "$LCERTS_DIR" |while read -d $'\0' relcert ; do
@@ -68,7 +79,18 @@ if [ -d "$HOME/$MOZILLA_DIR" ] ; then
 				certutil -A -n "$info" -t "CT,C,C" -i "$certificate" -d "$dirname_cert"
 			fi
 		done
+		
+		# AUTOFIRMA  FIREFOX
+		if [ -e "$AUTOFIRMA_CRT" ]; then
+			FOUND=0
+			certutil -L -d "$dirname_cert" | grep $AUTOFIRMA_ALIAS || FOUND=1
+			if [ $FOUND = 1 ];then
+				certutil -A -n "$AUTOFIRMA_ALIAS" -t "TCP,TCP,TCP" -i "$AUTOFIRMA_CRT" -d sql:"$dirname_cert"
+			fi
+		fi
+	
 	done
+	
 fi
 
 exit 0
