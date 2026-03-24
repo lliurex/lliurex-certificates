@@ -62,11 +62,10 @@ if [ ! -e  "$NSSDBDIR" ]; then
 	certutil -d "$NSSDBDIR" -N --empty-password
 fi
 
-cert_databases=$(find "$HOME/$MOZILLA_DIR" "$HOME/$MOZILLA_DIR2" -name "$FIREFOX_CERT_DB" 2>/dev/null || true)" $PKIDIR"
+cert_databases=$(find "$HOME/$MOZILLA_DIR" "$HOME/$MOZILLA_DIR2" "$NSSDBDIR" -name "$FIREFOX_CERT_DB" 2>/dev/null || true)
 
 for cert_db in ${cert_databases} ; do 
 	dirname_cert=$(dirname "$cert_db")
-
 	if [ ! -O $cert_db ];then
 		# cert_db not owned by user. Default firefox profile is owned by root. Skipping...
 		continue
@@ -94,6 +93,7 @@ for cert_db in ${cert_databases} ; do
 			fi
 			rm -f "$TMP1" "$TMP2"
 		fi
+
 		if [ "$ADD_CERTIFICATE" = "Y" ] ; then
 			certutil -A -n "$info" -t "CT,C,C" -i "$certificate" -d "$dirname_cert"
 		fi
@@ -104,9 +104,13 @@ for cert_db in ${cert_databases} ; do
 	if [ -e "$AUTOFIRMA_CRT" ]; then
 		FOUND=0
 		certutil -L -d "$dirname_cert" | grep $AUTOFIRMA_ALIAS 1>/dev/null || FOUND=1
-		if [ $FOUND = 1 ];then
-			certutil -A -n "$AUTOFIRMA_ALIAS" -t "TCP,TCP,TCP" -i "$AUTOFIRMA_CRT" -d sql:"$dirname_cert"
+		if [ $FOUND = 0 ];then
+			# Lets make sure we have an updated certificate since we cannot rely on autofirma
+			# to update certs to ldap/AD users 
+			certutil -D -n "$AUTOFIRMA_ALIAS" -d sql:"$dirname_cert" || true
 		fi
+		
+		certutil -A -n "$AUTOFIRMA_ALIAS" -t "TCP,TCP,TCP" -i "$AUTOFIRMA_CRT" -d sql:"$dirname_cert"
 	fi
 
 done
