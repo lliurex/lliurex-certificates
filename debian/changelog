@@ -1,3 +1,11 @@
+lliurex-certificates (0.45.3) jammy; urgency=medium
+
+  * Small fixes in cert dirs find
+  * We cannot rely on autofirma to update LDAP/AD users. Deleting and adding
+    every time. This could be improved. 
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Tue, 24 Mar 2026 16:33:06 +0100
+
 lliurex-certificates (0.45.2) jammy; urgency=medium
 
   * Supporting both .mozilla and .config/mozilla
