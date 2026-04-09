@@ -22,12 +22,21 @@
 # variables
 
 MOZILLA_DIR=".mozilla"
+# from firefox 144 new config dir is found in .config/
+MOZILLA_DIR2=".config/mozilla/firefox"
+
 FIREFOX_CERT_DB="cert9.db"
+PKIDIR="$HOME/.pki"
+NSSDBDIR=$PKIDIR"/nssdb/"
 
 # variables
 CA_CERTS_DIR="/usr/share/ca-certificates"
 LCERTS_DIR="${CA_CERTS_DIR}/lliurex-certs"
 LCERTS_CFG="/etc/ca-certificates.conf"
+
+# Autofirma
+AUTOFIRMA_CRT="/usr/share/ca-certificates/Autofirma/Autofirma_ROOT.crt"
+AUTOFIRMA_ALIAS="SocketAutoFirma"
 
 # functions
 get_rel_files(){
@@ -36,39 +45,76 @@ get_rel_files(){
    return 0
 }
 
+if [ ! -e "$HOME" ]; then
+	
+	echo "User dir does not exist. Exiting..."
+	exit 0
 
-if [ -d "$HOME/$MOZILLA_DIR" ] ; then
-	# Mozilla user settings directory exist
-	cert_databases=$(find "$HOME/$MOZILLA_DIR" -name "$FIREFOX_CERT_DB")
-	for cert_db in ${cert_databases} ; do 
-		dirname_cert=$(dirname "$cert_db")
-		get_rel_files "$LCERTS_DIR" |while read -d $'\0' relcert ; do
-                	certificate="$LCERTS_DIR/$relcert"
-			info="$(openssl x509 -in $certificate -noout -subject |sed -e "s%^.*\/CN=\([^/]\+\).*$%\1%")"
-			ADD_CERTIFICATE="Y"
-			# search in database
-			if certutil -L -d "$dirname_cert" | grep -q "^$info" ; then
-				TMP1="$(tempfile)"
-				# dump new certificate
-				openssl x509 -in $certificate > "$TMP1" || true
-				TMP2="$(tempfile)"
-                                # dump current certificate
-				certutil -L -a -d "$dirname_cert" -n "$info" > "$TMP2" || true
-				# compare without cr/lf
-				if diff -q --strip-trailing-cr "$TMP1" "$TMP2" >/dev/null ; then
-					# are just the same, so do nothing
-					ADD_CERTIFICATE=""
-				else
-					# remove old
-					certutil -D -n "$info" -d "$dirname_cert" || true
-				fi
-				rm -f "$TMP1" "$TMP2"
-			fi
-			if [ "$ADD_CERTIFICATE" = "Y" ] ; then
-				certutil -A -n "$info" -t "CT,C,C" -i "$certificate" -d "$dirname_cert"
-			fi
-		done
-	done
 fi
+
+# Lets make sure we have profile dirs
+# There is no clean way to create a working firefox profile
+# other than executing firefox, and even with --headless option
+# I dont like the idea of doing so.
+
+if [ ! -e  "$NSSDBDIR" ]; then
+	mkdir -p "$NSSDBDIR"
+	certutil -d "$NSSDBDIR" -N --empty-password
+fi
+
+cert_databases=$(find "$HOME/$MOZILLA_DIR" "$HOME/$MOZILLA_DIR2" "$NSSDBDIR" -name "$FIREFOX_CERT_DB" 2>/dev/null || true)
+
+for cert_db in ${cert_databases} ; do 
+	dirname_cert=$(dirname "$cert_db")
+	if [ ! -O $cert_db ];then
+		# cert_db not owned by user. Default firefox profile is owned by root. Skipping...
+		continue
+	fi
+	
+	get_rel_files "$LCERTS_DIR" |while read -d $'\0' relcert ; do
+		certificate="$LCERTS_DIR/$relcert"
+		info="$(openssl x509 -in $certificate -noout -subject |sed -e "s%^.*\/CN=\([^/]\+\).*$%\1%")"
+		ADD_CERTIFICATE="Y"
+		# search in database
+		if certutil -L -d "$dirname_cert" | grep -q "^$info" ; then
+			TMP1="$(mktemp)"
+			# dump new certificate
+			openssl x509 -in $certificate > "$TMP1" || true
+			TMP2="$(mktemp)"
+			# dump current certificate
+			certutil -L -a -d "$dirname_cert" -n "$info" > "$TMP2" || true
+			# compare without cr/lf
+			if diff -q --strip-trailing-cr "$TMP1" "$TMP2" >/dev/null ; then
+				# are just the same, so do nothing
+				ADD_CERTIFICATE=""
+			else
+				# remove old
+				certutil -D -n "$info" -d "$dirname_cert" || true
+			fi
+			rm -f "$TMP1" "$TMP2"
+		fi
+
+		if [ "$ADD_CERTIFICATE" = "Y" ] ; then
+			certutil -A -n "$info" -t "CT,C,C" -i "$certificate" -d "$dirname_cert"
+		fi
+
+	done
+	
+	# AUTOFIRMA 
+	if [ -e "$AUTOFIRMA_CRT" ]; then
+		FOUND=0
+		certutil -L -d "$dirname_cert" | grep $AUTOFIRMA_ALIAS 1>/dev/null || FOUND=1
+		if [ $FOUND = 0 ];then
+			# Lets make sure we have an updated certificate since we cannot rely on autofirma
+			# to update certs to ldap/AD users 
+			certutil -D -n "$AUTOFIRMA_ALIAS" -d sql:"$dirname_cert" || true
+		fi
+		
+		certutil -A -n "$AUTOFIRMA_ALIAS" -t "TCP,TCP,TCP" -i "$AUTOFIRMA_CRT" -d sql:"$dirname_cert"
+	fi
+
+done
+	
+
 
 exit 0
